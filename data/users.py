@@ -71,6 +71,7 @@ def edit_user_rating(user_name, feed_id, rating):
     # Save data
     JI.json_push_data(json.dumps(data))
 
+
 # Delete user
 def delete_user(user_name):
     # Get JSON Data
