@@ -12,8 +12,6 @@ def json_get_data():
         data = json.loads(data)
     return data
 
-json_get_data()
-
 # Push data
 def json_push_data(data):
     with open(file_name, "w") as json_file:
