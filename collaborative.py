@@ -5,7 +5,7 @@ import numpy as np
 import json_implementation as JI
 
 # Getting data
-ratings = JI.json_get_data()
+ratings = JI.json_get_data()["collaborative_filtering_ratings"]
 
 # New user stats
 handling_user_ratings = [1, 3, 0, 0, 0]
