@@ -31,5 +31,3 @@ for user_ratings in ratings:
 cosine_values.sort(key=lambda item: sorted(list(item.keys())), reverse=True)
  
 print(cosine_values)
-
-
