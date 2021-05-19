@@ -2,18 +2,18 @@
 
 # Dependencies
 import numpy as np
-import json_implementation as JI
+import json_implementation as ji
 
 # Getting data
-ratings = JI.json_get_data()["collaborative_filtering_ratings"]
+ratings = ji.json_get_data()["collaborative_filtering_ratings"]
 
 # New user stats
 handling_user_ratings = [1, 3, 0, 0, 0]
 
 # Cosine calculation
-def cosine(user_a, user_b):
-    vector_a = np.array(user_a)
-    vector_b = np.array(user_b)
+def cosine(ratings_a, ratings_b):
+    vector_a = np.array(ratings_a)
+    vector_b = np.array(ratings_b)
 
     length_a = np.linalg.norm(vector_a)
     length_b = np.linalg.norm(vector_b)
