@@ -63,5 +63,4 @@ def calc_cosine_distances(text_to_compare):
 
 
 cosine_distances = calc_cosine_distances(current_user_text)
-
 print(cosine_distances)
