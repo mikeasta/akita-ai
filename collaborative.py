@@ -28,7 +28,7 @@ for user_ratings in ratings:
     current_distance = cosine(handling_user_ratings, user_ratings)
     cosine_values.append({current_distance: user_ratings})
 
-
+    
 # Descending sort
 cosine_values.sort(key=lambda item: sorted(list(item.keys())), reverse=True)
 print(cosine_values)
