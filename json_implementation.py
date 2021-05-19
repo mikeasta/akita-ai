@@ -3,7 +3,7 @@ import json
 import config
 
 # Database file name
-file_name = config.FILE_NAME
+file_name = config.DB_FILE_NAME
 
 # Get data
 def json_get_data():

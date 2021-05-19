@@ -62,6 +62,6 @@ def calc_cosine_distances(text_to_compare):
     return cosine_distances
 
 
-handled= calc_cosine_distances(current_user_text)
+cosine_distances = calc_cosine_distances(current_user_text)
 
-print(handled)
+print(cosine_distances)
