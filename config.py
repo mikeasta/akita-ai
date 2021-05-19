@@ -1,2 +1,2 @@
 # Database file name
-FILE_NAME = "database.json"
+DATABASE_FILE_NAME = "database.json"
