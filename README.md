@@ -260,7 +260,7 @@ for i in range(document_amount):
         cosine_distances.append(cosine(vector_comparable, vector_current))
 ```
 
-<p>1. Переменные <b>comparable_text_library</b> и <b>current_text_library</b> хранят в себе словари уникальных слов с их весами: <b>comparable_text_library</b> - описания, переданного в качестве аргумента в функцию <b>calc_cosine_distances()</b>, <b>current_text_library</b> - итерируемого описания.</p>
+<p>Переменные <b>comparable_text_library</b> и <b>current_text_library</b> хранят в себе словари уникальных слов с их весами: <b>comparable_text_library</b> - описания, переданного в качестве аргумента в функцию <b>calc_cosine_distances()</b>, <b>current_text_library</b> - итерируемого описания.</p>
 <p>Следующим шагом мы "сбалансируем" оба словаря: если слово есть в одном словаре, но отсутствует во втором, то во втором словаре свойство по ключу этого слова приобретает значение 0. Балансировка производится следующими двумя циклами:</p>
 
 ```python
