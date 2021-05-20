@@ -8,10 +8,11 @@ import string
 
 # Texts
 texts = ji.json_get_data()["content_based_texts"]
+document_amount = len(texts)
 
 
 # Current user text
-current_user_text = ji.json_get_data()["content_based_user_text"]
+current_user_text = texts[0]
 
 
 # Cosine distance
@@ -31,9 +32,21 @@ def calc_words_weight(text):
         word_vocabulary[word] = word_vocabulary[word] + 1 if word in word_vocabulary else 1
         
     unique_words_amount = len(word_vocabulary)
-
+        
     for word in word_vocabulary:
-        word_vocabulary[word] = word_vocabulary[word] / unique_words_amount
+        # IDF value 
+        found_times = 0
+        for i in range(document_amount):
+            if texts[i].lower().find(word) != -1:
+                found_times += 1
+
+        idf = np.log10(document_amount / found_times)
+
+        # TF value
+        tf = word_vocabulary[word] / unique_words_amount
+
+        # TF-IDF value
+        word_vocabulary[word] = tf * idf
     
     return word_vocabulary
     
@@ -42,7 +55,7 @@ def calc_words_weight(text):
 def calc_cosine_distances(text_to_compare):
     cosine_distances = []
 
-    for i in range(16):
+    for i in range(document_amount):
         comparable_text_library = calc_words_weight(text_to_compare)
         current_text_library    = calc_words_weight(texts[i])
 
