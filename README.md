@@ -294,6 +294,7 @@ print(cosine_distance)
 ```
 
 <p>Видим в консоли:</p>
+
 ```
 [1.0, 0.030152426954748984, 0.013230729574516273, 0.022993496297877468, 0.0025800777912773722, 0.04655763636782153, 0.01640286400535773, 0.02678171870008438, 0.022821365099150722, 0.0317724470755004, 0.047416344325109175, 0.026850780497314753, 0.001052066339123618, 0.006789040882787158, 0.020286825521895646, 0.017898539423519832]
 ```
@@ -322,3 +323,15 @@ print(cosine_distance)
         "After a better part of a year of work, I am excited to show you a brand new Map of the Internet, up to date for the year 2021.Inspired by design of historical maps, this project aims to concisely, but still comprehensively visualize the current state of the World Wide Web, and document the largest and most popular websites over the period of 2020-2021, along with their countless aspects and featuresCompared to any previous iteration of the Map of the Internet, this new version is many times more detailed and informative. It includes several thousand of some of the most popular websites, represented as distinct 'countries', which are grouped together with others of similar type or category, forming dozens of distinct clusters, regions and continents that stretch throughout the map, such as 'news sites', 'search engines', 'social networks', 'e-commerce', 'adult entertainment', 'file sharing', 'software companies' and so much more.  In the center of it all can be found ISPs and web browsers, which form the core and backbone of the internet as we know it, while the far south is the domain of the mysterious 'dark web'Color schemes of websites are based on the dominant colors of their user interface or logo. To add further detail and provide deeper insight, many features and services provided by these websites, their sections and content categories, as well as distinct content creators, are labeled as cities and towns (which number at well over 10 thousand). Website founders and CEOs are represented as capital cities, while hundreds of the most popular users of social networks and celebrities can be found in the realms of Youtube, Facebook, or Twitter. Mountains, hills, seas and valleys represent a wide variety of aspects of the internet, its culture and computer science overall, while almost a hundred of some of the most important internet and computing pioneers are also featured on the map in the names of underwater ridges. "
 ]
 ```
+
+<p>Запустим наш код снова и увидим: </p>
+
+```
+[0.9999999999999999, 0.9956211623831076, 0.02914939876519776, 0.012691744744685306, 0.02315378896502182, 0.0026965190476785, 0.04466838871973892, 0.015965762985723213, 0.024941732080303914, 0.022006604063701377, 0.027991539759071555, 0.04409433497579286, 0.026047468085629355, 0.0010747100368175154, 0.006833464594492515, 0.019933764227742016, 0.016376225289847206]
+```
+
+<p>Второе значение (наш добавленный и очень похожий на первое описание текст) явно меньше единицы и можно заявить, что он отличается, от первого текста, но он же и очень похож на первый текст (т.е. косинусное расстояние близится к единице), так как разница в два слова совсем невелика.</p>
+<br>
+<p>Мы с вами разобрали два основных подхода к построению рекомендательных систем. Оба из них содержат свои плюсы и минусы. Самым идеальными вариантом для сайта или приложения очень часто служит гибридные РС, которые содержат в себе те или иные фишки этих двух систем. Во всяком случае, за основу почти всегда берется один из выше перечисленных вариантов рекомендательных систем.</p>
+<br>
+<h3>Спасибо за внимание!</h3>
