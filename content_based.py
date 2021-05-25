@@ -4,6 +4,7 @@
 import numpy as np
 import json_implementation as ji
 import string
+from stop_words import get_stop_words
 
 
 # Texts
@@ -13,6 +14,10 @@ document_amount = len(texts)
 
 # Current user text
 current_user_text = texts[0]
+
+
+# Stop words library
+stop_words_array = get_stop_words("en")
 
 
 # Cosine distance
@@ -25,9 +30,9 @@ def cosine(vector_a, vector_b):
 
 # Calculate text's words weight
 def calc_words_weight(text):
-    word_array = [word.strip(string.punctuation).lower() for word in text.split()]
-
+    word_array = [word.strip(string.punctuation).lower() for word in text.split() if word.strip(string.punctuation).lower() not in stop_words_array]
     word_vocabulary = {}
+
     for word in word_array:
         word_vocabulary[word] = word_vocabulary[word] + 1 if word in word_vocabulary else 1
         
