@@ -133,9 +133,9 @@ def cosine(vector_a, vector_b):
 
 ```python
 def calc_words_weight(text):
-   word_array = [word.strip(string.punctuation).lower() for word in text.split() if word.strip(string.punctuation).lower() not in stop_words_array]
+    word_array = [word.strip(string.punctuation).lower() for word in text.split() if word.strip(string.punctuation).lower() not in stop_words_array]
     word_vocabulary = {}
-    
+
     for word in word_array:
         word_vocabulary[word] = word_vocabulary[word] + 1 if word in word_vocabulary else 1
         
