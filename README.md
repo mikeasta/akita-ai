@@ -257,20 +257,28 @@ Good 5 : we don't recommend this good
 <p>Для начала импортируем нужные нам библиотеки:</p>
 
 ```python
+# Dependencies
 import numpy as np
 import json_implementation as ji
 import string
+import spacy
 from stop_words import get_stop_words
 ```
 
-<p>Все то же самое, что и в <b>collaborative.py</b>, только добавились две небольших библиотеки. <b>import string</b> нам понадобится при разделении текста на слова, а <b>from stop_words import get_stop_words</b> для удаления всех ненужных местоимений, артиклей, предлогов и т.д.</p>
+<p>Стоит отметить, что в данной программе мы будем работать с текстами, поэтому нам важно импортировать нужные нам модули. <b>import string</b> на понадобится при разделении строки по знакам препинания и по пробелам, <b>import spacy</b> используется для <a href="https://ru.wikipedia.org/wiki/%D0%9B%D0%B5%D0%BC%D0%BC%D0%B0%D1%82%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D1%8F" target="_blank">лемматизации</a> текста, а <b>from stop_words import get_stop_words</b> для чистки предложений от так называемых стоп-слов (артикли, предлоги, союзы и т.д.).</p>
 <p>Дальше сохраняем в переменную <b>texts</b> тексты наших зарезервированных описаний, <b>document_amount</b> - длину коллекции описаний (количество текстов описаний),а в <b>current_user_text</b> - текст описания предмета, который понравился нашему пользователю (на этот текст мы и будем ориентироваться при подборе подходящего предмета).</p>
   
- ```python
+```python
 texts = ji.json_get_data()["content_based_texts"]
 document_amount = len(texts)
 
 current_user_text = texts[0]
+```
+
+<p> Инициализируем модель <b>nlp</b> пакета <b>spacy</b> для последующих лемматизаций текста.</p>
+
+```python
+nlp = spacy.load("en_core_web_sm")
 ```
 
 <p> С использованием импортированной из <b>stop_words</b> функции <b>get_stop_words()</b> получим массив стоп-слов английского языка</p>
@@ -279,7 +287,7 @@ current_user_text = texts[0]
 stop_words_array = get_stop_words("en")
 ```
 
-<p> Дальше прописываем уже знакомую нам функцию рассчета косинусного сходства: </p>
+<p> Дальше прописываем функцию рассчета косинусного сходства: </p>
 
 ```python
 def cosine(vector_a, vector_b):
@@ -293,6 +301,12 @@ def cosine(vector_a, vector_b):
 
 ```python
 def calc_words_weight(text):
+
+    # Lemmatizing
+    word_array = nlp(text)
+    text = " ".join([token.lemma_ for token in word_array])
+
+    # Deleting stop words
     word_array = [word.strip(string.punctuation).lower() for word in text.split() if word.strip(string.punctuation).lower() not in stop_words_array]
     word_vocabulary = {}
 
@@ -321,7 +335,15 @@ def calc_words_weight(text):
 
 <p>Функция <b>calc_words_weight(text)</b> принимает в качестве аргумента текст и возвращает объект весов каждого слова. Разберем эту функцию построчно.</p>
 
-<p>Cперва мы разобьем наш текст на массив отдельных слов и удалим все "стоп_слова" с помощью данной строки кода:</p>
+<p>Сперва применим лемматизацию. Мы разбиваем текст по словам при помощи <b>nlp()</b>, а затем объединяем в один текст, но уже в текст вставляем леммы слов, на которые был разбит наше текст:</p>
+
+```python
+# Lemmatizing
+word_array = nlp(text)
+text = " ".join([token.lemma_ for token in word_array])
+```
+
+<p>Затем мы разобьем наш текст на массив отдельных слов и удалим все "стоп_слова" с помощью данной строки кода:</p>
 
 ```python
 word_array = [word.strip(string.punctuation).lower() for word in text.split() if word.strip(string.punctuation).lower() not in stop_words_array]

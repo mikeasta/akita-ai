@@ -13,12 +13,12 @@ texts = ji.json_get_data()["content_based_texts"]
 document_amount = len(texts)
 
 
-# Initialazing spacy model
-nlp = spacy.load("en_core_web_sm")
-
-
 # Current user text
 current_user_text = texts[0]
+
+
+# Initialazing spacy model
+nlp = spacy.load("en_core_web_sm")
 
 
 # Stop words library
