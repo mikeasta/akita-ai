@@ -322,7 +322,7 @@ def calc_words_weight(text):
             if texts[i].lower().find(word) != -1:
                 found_times += 1
 
-        idf = np.log10(document_amount / found_times)
+        idf = np.log10(document_amount / found_times or 1)
 
         # TF value
         tf = word_vocabulary[word] / unique_words_amount
@@ -376,7 +376,7 @@ for word in word_vocabulary:
         if texts[i].lower().find(word) != -1:
             found_times += 1
 
-     idf = np.log10(document_amount / found_times)
+     idf = np.log10(document_amount / found_times or 1)
 
     # TF value
     tf = word_vocabulary[word] / unique_words_amount
