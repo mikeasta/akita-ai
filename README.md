@@ -28,10 +28,11 @@
 <br>
 
 <h4> Перейдем к коду: </h4>
-<p>Для начала импортируем необходимые модули: <b>numpy</b> для работы с векторами и <b>json_implementation</b> для загрузки данных</p>
+<p>Для начала импортируем необходимые модули: <b>numpy</b> для работы с векторами и <b>json_implementation</b> для загрузки данных. Также импортируем переменные <b>RATING_TO_RECOMMEND, SAME_RATIO</b> из файла конфигурации. <b>RATING_TO_RECOMMEND</b> показывает, ниже какой оценки нельзя рекомендовать пользователю товар. <b>SAME_RATIO</b> - точность, которую мы требуем, чтобы сравниваемый вектор имел, чтобы мы могли спокойно по нему сделать предсказание:</p>
 
 ```python
 import numpy as np
+from config import RATING_TO_RECOMMEND, SAME_RATIO
 import json_implementation as ji
 ```
 
@@ -72,14 +73,173 @@ cosine_values.sort(key=lambda item: sorted(list(item.keys())), reverse=True)
 print(cosine_values)
 ```
 
-<p> Создали пустой массив <b>cosine_values</b>, который будет хранить в себе объекты : "косинусное сходство с заданным пользователем" : "вектор". Цикл перебирает каждый вектор в массиве векторов, сохраняет в переменную <b>current_distance</b> результат подсчета косинусного сходства заданного и итерируемого пользователя и записывает в массив новый объект. Методом массивов <b>.sort()</b> сортируем в обратном порядке массив косинусных расстояний - ведь чем больше косинусное расстояние , тем более похожий на заданного пользователя итерируемый пользователь.</p>
-<p>Запускаем .py документ и наблюдаем: </p>
+<p> Создали пустой массив <b>cosine_values</b>, который будет хранить в себе объекты : "косинусное сходство с заданным пользователем" : "вектор". Цикл перебирает каждый вектор в массиве векторов, сохраняет в переменную <b>current_distance</b> результат подсчета косинусного сходства заданного и итерируемого пользователя и записывает в массив новый объект. Методом массивов <b>.sort()</b> сортируем в обратном порядке массив косинусных расстояний - ведь чем больше косинусное расстояние, тем более похожий на заданного пользователя итерируемый пользователь.</p>
+<p>Осталось изучить последнюю функцию, которая собственно и предскажет, какие оценки поставит пользователь товарам:</p>
+
+```python
+# Recommendation UI
+def recommend(cosine_values, user_ratings):
+
+    # Check, if we need to make a prediction
+    if 0 not in user_ratings: return
+
+    # Define, which goods we should recommend or not
+    print("\nUser ratings:", user_ratings)
+
+    # Buffer rating
+    buffer_user_rating = list.copy(user_ratings)
+
+    # Handle each vector to predict users rating
+    for user_index, user_data in enumerate(cosine_values):
+        
+        # Get it's key & property
+        key_distance = list(user_data.keys())[0]
+        prop_vector  = user_data[key_distance]
+        print("Vector", user_index + 1, ":", key_distance, ", ", prop_vector)
+
+        # Check if difference is too big
+        if key_distance < SAME_RATIO: break
+
+        # Handle every coordinate in prop vector
+        for i in range(5):
+            # Check if data and current prop vector coordinate is already written
+            if prop_vector[i] != 0 and buffer_user_rating[i] == 0:
+                buffer_user_rating[i] = prop_vector[i]
+    
+        if 0 not in buffer_user_rating: break
+
+    print("Most nearest prediction:", buffer_user_rating, "\n")
+
+    # Say, if we recommend this good to recommend 
+    for i in range(5):
+        # Check, if rating is already written
+        if user_ratings[i] != 0: continue
+
+        recommend_string = ""
+        if buffer_user_rating[i] == 0:
+            recommend_string = "we can't make a reliable prediction with that good"
+        elif buffer_user_rating[i] < RATING_TO_RECOMMEND:
+            recommend_string = "we don't recommend this good"
+        else: 
+            recommend_string = "we recommend this good"
+
+        print("Good", i + 1, ":", recommend_string)
+```
+<p>На вход функция принимает два параметра: найденные косинусные расстояния и сам вектор пользователя. Смысл функции весьма прост: предсказать, какие оценки поставит товарам пользователь, исходя из оценок схожих по интересам других пользователей, и определить по найденным оценкам, стоит ли вообще рекомендовать пользователю данный продукт, или все таки не стоит из-за низких оценок. Разберем функцию построчно:</p>
+
+<p>Проверим, существует ли вообще необходимость в предсказании. Ведь если все оценки уже выставлены, то смысла предсказывать, очевидно, нет. Эта проверка окажется бесполезной, т.к. в ситуации, когда наименований товаров насчитывается несколько сотен или даже тысяч, пользователь очень навряд ли смог бы проставить абсолютно все оценки всем товарам. Поэтому в большом проекте эта проверка ненужна, но так как мы имеем дело с очень ограниченной библиотекой товаров, такая проверка не будет лишней.</p>
+
+```python
+# Check, if we need to make a prediction
+if 0 not in user_ratings: return
+```
+
+<p>Выводим в консоль имеющийся массив словарей расстояний до векторов и копируем в буферный массив оценки нашего пользователя. Он нам пригодится для заполнения нашего предсказания.</p>
+
+```python
+# Define, which goods we should recommend or not
+print("\nUser ratings:", user_ratings)
+
+# Buffer rating
+buffer_user_rating = list.copy(user_ratings)
+```
+<p>Затем нам собственно и нужно заполнить наш буферный вектор для предсказания. С помощью цикла мы перебираем каждый похожий вектор (каждый новый вектор похож на нашего пользователя все меньше), пока мы не дойдем до вектора, уровень схожести с которым опустится ниже заданного нами SAME_RATIO или пока мы не совершим все предсказания и полностью не заполним наш буферный вектор. Построчный разбор чуть ниже:</p>
+
+```python
+# Handle each vector to predict users rating
+for user_index, user_data in enumerate(cosine_values):
+    
+    # Get it's key & property
+    key_distance = list(user_data.keys())[0]
+    prop_vector  = user_data[key_distance]
+    print("Vector", user_index + 1, ":", key_distance, ", ", prop_vector)
+
+    # Check if difference is too big
+    if key_distance < SAME_RATIO: break
+
+    # Handle every coordinate in prop vector
+    for i in range(5):
+        # Check if data and current prop vector coordinate is already written
+        if prop_vector[i] != 0 and buffer_user_rating[i] == 0:
+            buffer_user_rating[i] = prop_vector[i]
+
+    if 0 not in buffer_user_rating: break
+```
+<p>Сохраним данные ключа и вектора по этому ключу в переменные, а также выведем в консоль итерируемый вектор.</p>
+
+```python
+# Get it's key & property
+key_distance = list(user_data.keys())[0]
+prop_vector  = user_data[key_distance]
+print("Vector", user_index + 1, ":", key_distance, ", ", prop_vector)
+```
+<p>Запишем условие, что если мы достигли границы схожести, цикл прекращает работу.</p>
+
+```python
+# Check if difference is too big
+if key_distance < SAME_RATIO: break
+```
+<p>Циклом переберем итерируемый вектор: если у итерируемого вектора в позиции i есть значение, а у буферного - нет, тогда сохраним в буферный вектор то значение, отличное от нуля, которое мы нашли у итерируемого вектора.</p>
+
+```python
+# Handle every coordinate in prop vector
+for i in range(5):
+    # Check if data and current prop vector coordinate is already written
+    if prop_vector[i] != 0 and buffer_user_rating[i] == 0:
+        buffer_user_rating[i] = prop_vector[i]
+```
+
+<p>В конце цикла сделаем проверку на наличие в буферном векторе нулевых значений.</p>
+
+```python
+if 0 not in buffer_user_rating: break
+```
+
+<p>В функции <b>recommend()</b> выведем в консоль получившийся предсказанный вектор</p>
+
+```python
+print("Most nearest prediction:", buffer_user_rating, "\n")
+```
+
+<p>В последнем цикле функции мы будем сравнивать предсказанный вектор с нашим исходным, найдем новые вставленные предсказанные оценки, а заодно скажем, стоит ли рекомендовать данный товар пользователю или нет:</p>
+
+```python
+# Say, if we recommend this good to recommend 
+for i in range(5):
+    # Check, if rating is already written
+    if user_ratings[i] != 0: continue
+
+    recommend_string = ""
+    if buffer_user_rating[i] == 0:
+        recommend_string = "we can't make a reliable prediction with that good"
+    elif buffer_user_rating[i] < RATING_TO_RECOMMEND:
+        recommend_string = "we don't recommend this good"
+    else: 
+        recommend_string = "we recommend this good"
+
+    print("Good", i + 1, ":", recommend_string)
+```
+
+<p>Вызовем <b>recommend()</b> с надлежащими аргументами:</p>
+
+```python
+recommend(cosine_values, handling_user_ratings)
+```
 
 ```
-[{0.9534625892455924: [1, 3, 0, 1, 0]}, {0.8280786712108251: [0, 4, 1, 0, 2]}, {0.7911548052852398: [1, 4, 3, 0, 1]}, {0.760638829255665: [3, 2, 0, 1, 0]}, {0.5976143046671968: [1, 3, 0, 3, 3]}, {0.50709255283711: [3, 1, 0, 0, 2]}, {0.42426406871192845: [0, 1, 0, 2, 0]}, {0.35233213170882205: [0, 2, 3, 0, 4]}, {0.3450327796711771: [2, 1, 0, 4, 0]}, {0.29814239699997197: [4, 0, 1, 1, 0]}, {0.28603877677367767: [0, 1, 0, 3, 1]}, {0.28284271247461895: [2, 0, 0, 0, 1]}, {0.2300894966542111: [0, 1, 4, 0, 0]}, {0.07254762501100116: [1, 0, 3, 3, 0]}, {0.0: [0, 0, 1, 3, 4]}, {0.0: [0, 0, 3, 1, 2]}]
+[{0.9534625892455924: [1, 3, 0, 1, 0]}, {0.7911548052852398: [1, 4, 3, 0, 1]}, {0.760638829255665: [3, 2, 0, 1, 0]}, {0.6605782590758164: [0, 4, 1, 0, 4]}, {0.5976143046671968: [1, 3, 0, 3, 3]}, {0.50709255283711: [3, 1, 0, 0, 2]}, {0.42426406871192845: [0, 1, 0, 2, 0]}, {0.35233213170882205: [0, 2, 3, 0, 4]}, {0.3450327796711771: [2, 1, 0, 4, 0]}, {0.29814239699997197: [4, 0, 1, 1, 0]}, {0.28603877677367767: [0, 1, 0, 3, 1]}, {0.28284271247461895: [2, 0, 0, 0, 1]}, {0.2300894966542111: [0, 1, 4, 0, 0]}, {0.07254762501100116: [1, 0, 3, 3, 0]}, {0.0: [0, 0, 1, 3, 4]}, {0.0: [0, 0, 3, 1, 2]}]
+
+User ratings: [1, 3, 0, 0, 0]
+Vector 1 : 0.9534625892455924 ,  [1, 3, 0, 1, 0]
+Vector 2 : 0.7911548052852398 ,  [1, 4, 3, 0, 1]
+Most nearest prediction: [1, 3, 3, 1, 1]
+
+Good 3 : we don't recommend this good
+Good 4 : we don't recommend this good
+Good 5 : we don't recommend this good
 ```
 
-<p>Как можем заметить, первый вектор <b>[1, 3, 0, 1, 0]</b> система принимает за самый похожий на наш заданный <b>[1, 3, 0, 0, 0]</b>. И ведь это именно так! Исходя из таких сравнений система начинает понимать, стоит ли по оценкам похожих пользователей предлагать данному пользователю данный продукт.</p>
+<p>Как можем заметить, первый вектор <b>[1, 3, 0, 1, 0]</b> система принимает за самый похожий на наш заданный <b>[1, 3, 0, 0, 0]</b>. И ведь это именно так! Ниже программа провела осмотр векторов по заданной нами точности и предсказала, какие оценки поставит данный пользователь тем или иным товарам, а в конце подытожила, стоит ли рекомендовать данный товар, или нет.</p>
 <br>
 <h3>Content-based.py - фильтрация на основе контента </h3>
 <p>Данный тип рекомендательных систем немного сложнее, нежели коллаборативная фильтрация, однако познакомившись с принципом работы косинусного сходства, нам будет намного проще разобрать систему, основанную на контенте. Здесь читателю необходимо изучить <a href="https://ru.wikipedia.org/wiki/TF-IDF">TF-IDF меру</a> для того, чтобы разобраться с принципом работы следующего кода. Фильтрация на основе контента уже не столько относится к сравнению между собой интересов пользователей, сколько сравнение интересов пользователя с контентом, имеющимся на сайте или в приложении. Как и при коллаборативной фильтрации мы будем иметь дело с векторами, только в данном случае - векторами весов слов, содержащихся в тексте.</p>

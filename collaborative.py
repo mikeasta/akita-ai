@@ -29,16 +29,17 @@ for user_ratings in ratings:
     current_distance = cosine(handling_user_ratings, user_ratings)
     cosine_values.append({current_distance: user_ratings})
 
-    
-# Recommendation UX
+
+# Descending sort
+cosine_values.sort(key=lambda item: sorted(list(item.keys())), reverse=True)
+print(cosine_values)
+
+
+# Recommendation UI
 def recommend(cosine_values, user_ratings):
 
     # Check, if we need to make a prediction
     if 0 not in user_ratings: return
-
-    # Descending sort
-    cosine_values.sort(key=lambda item: sorted(list(item.keys())), reverse=True)
-    print(cosine_values)
 
     # Define, which goods we should recommend or not
     print("\nUser ratings:", user_ratings)
@@ -65,9 +66,8 @@ def recommend(cosine_values, user_ratings):
     
         if 0 not in buffer_user_rating: break
 
-    print("Most nearest prediction:", buffer_user_rating)
-    print()
-    
+    print("Most nearest prediction:", buffer_user_rating, "\n")
+
     # Say, if we recommend this good to recommend 
     for i in range(5):
         # Check, if rating is already written
