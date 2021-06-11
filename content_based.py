@@ -30,7 +30,10 @@ def cosine(vector_a, vector_b):
 
 # Calculate text's words weight
 def calc_words_weight(text):
+
+    # Lemmatizing text
     word_array = [word.strip(string.punctuation).lower() for word in text.split() if word.strip(string.punctuation).lower() not in stop_words_array]
+    word_array = [Word(word).lemmatize() for word in word_array]
     word_vocabulary = {}
 
     for word in word_array:
