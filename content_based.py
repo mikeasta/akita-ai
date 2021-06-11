@@ -4,12 +4,17 @@
 import numpy as np
 import json_implementation as ji
 import string
+import spacy
 from stop_words import get_stop_words
 
 
 # Texts
 texts = ji.json_get_data()["content_based_texts"]
 document_amount = len(texts)
+
+
+# Initialazing spacy model
+nlp = spacy.load("en_core_web_sm")
 
 
 # Current user text
@@ -31,9 +36,12 @@ def cosine(vector_a, vector_b):
 # Calculate text's words weight
 def calc_words_weight(text):
 
-    # Lemmatizing text
+    # Lemmatizing
+    word_array = nlp(text)
+    text = " ".join([token.lemma_ for token in word_array])
+
+    # Deleting stop words
     word_array = [word.strip(string.punctuation).lower() for word in text.split() if word.strip(string.punctuation).lower() not in stop_words_array]
-    word_array = [Word(word).lemmatize() for word in word_array]
     word_vocabulary = {}
 
     for word in word_array:
@@ -48,7 +56,7 @@ def calc_words_weight(text):
             if texts[i].lower().find(word) != -1:
                 found_times += 1
 
-        idf = np.log10(document_amount / found_times)
+        idf = np.log10(document_amount / (found_times or 1))
 
         # TF value
         tf = word_vocabulary[word] / unique_words_amount
