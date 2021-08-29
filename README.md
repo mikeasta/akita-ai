@@ -1,5 +1,5 @@
 <img src="https://cdn.dribbble.com/users/1885550/screenshots/3795640/akita-inu.jpg" align="right" width="300px"></img>
-<h2>Akita.AI - Рекомендательная система</h2>
+<h2>Akita.AI - Пример рекомендательных систем</h2>
 <h3><b>Систему разработали студенты группы 0391:</b></h3>
 <ul> 
   <li>Андрющенко Ксения</li>
